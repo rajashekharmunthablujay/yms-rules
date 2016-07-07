@@ -1,0 +1,15 @@
+package com.kewill.rules;
+
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsHeader;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsList;
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+
+rule "LastRule"
+	dialect "mvel"
+	agenda-group "LastRules"
+	when
+		$ymsRequest : YMSLocationFilterRequest( )
+	then
+		$ymsRequest.getCharacteristicsHeader().clear();
+		System.out.println("Last Rule");
+end

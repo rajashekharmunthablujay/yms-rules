@@ -1,0 +1,20 @@
+package com.kewill.rules;
+
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Appointment;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Truck;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Trailer;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+rule "HazCheck"
+	dialect "mvel"
+	salience 99
+	when
+		$ymsRequest : YMSLocationFilterRequest( )
+		$appointment : Appointment( ) from $ymsRequest.appointment
+		$truck : Truck( ) from $appointment.truck
+		trailer : Trailer( eval( isIsHaz() )) from $truck.trailer
+	then
+		trailer.setFlex1( "Hazardous" );
+		System.out.println("Rule : HazCheck");
+end

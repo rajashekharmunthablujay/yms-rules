@@ -1,0 +1,29 @@
+package com.kewill.rules;
+
+import com.kewill.generic.domains.jaxb.characteristics.Characteristics;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsHeader;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsList;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Appointment;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Order;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Trailer;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Truck;
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+import java.util.Map;
+import com.kewill.util.RulesUtil;
+
+rule "DockAllocationRule9"
+	dialect "mvel"
+	salience 50
+	when
+		$ymsRequest : YMSLocationFilterRequest( )
+		$appointment : Appointment( ) from $ymsRequest.appointment
+		$truck : Truck( ) from $appointment.truck
+		$trailer : Trailer( ) from $truck.trailer
+		$dock : CharacteristicsHeader( ) from $ymsRequest.characteristicsHeader
+		$char : CharacteristicsList( names != null , names.get("Cargo Type") == $trailer.flex1 || ( names.get("Cargo Type") != "Hazardous" && $trailer.flex1 == null )) from $dock.characteristicsList
+		eval(($char.names.get("Volume")==null || $char.names.get("Weight")==null) || ($trailer.totalVolume!=null && $trailer.totalVolume.compareTo(RulesUtil.convertToBigDecimal($char.names.get("Volume")))<1 ||  $trailer.totalWeight!=null && $trailer.totalWeight.compareTo(RulesUtil.convertToBigDecimal($char.names.get("Weight")))<1))
+	then
+		System.out.println("Rule : DockAllocationRule9:PeakValue "+$trailer.flex2);
+		$trailer.addDockCode( $dock.finalSlotCode, $dock.locationType, $trailer.flex2 );
+		setFocus("LastRules")
+end

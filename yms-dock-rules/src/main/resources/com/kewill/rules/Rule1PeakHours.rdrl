@@ -1,0 +1,21 @@
+package com.kewill.rules;
+
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Appointment;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Truck;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Trailer;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+rule "Rule1PeakHours"
+	dialect "mvel"
+	salience 99
+	when
+		$ymsRequest : YMSLocationFilterRequest( )
+		$appointment : Appointment( ) from $ymsRequest.appointment
+		$truck : Truck( ) from $appointment.truck
+		trailer : Trailer( ) from $truck.trailer
+		XMLGregorianCalendar( eval( getHour()>=16 ), eval( getHour()<=18 )) from trailer.slotFromDateTime
+	then
+		trailer.setFlex2( "YesPeakTime" );
+		System.out.println("Rule :Peak hours");
+end

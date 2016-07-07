@@ -1,0 +1,16 @@
+package com.kewill.rules;
+
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsHeader;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsList;
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+
+rule "DockAllocation1"
+	dialect "mvel"
+	salience 99
+	when
+		$ymsRequest : YMSLocationFilterRequest( )
+		$dock : CharacteristicsHeader( $dockList : characteristicsList) from $ymsRequest.characteristicsHeader
+	then
+		$dockList.convertToMap(  );
+		System.out.println("Rule : Dockallocation1");
+end
