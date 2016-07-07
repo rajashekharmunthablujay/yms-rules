@@ -1,0 +1,15 @@
+package com.kewill.yms.parking.rules;
+
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsList;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsHeader;
+
+rule "ConvertToMapRule"
+	dialect "mvel"
+	salience 99
+	when
+		$parkingRequest : YMSLocationFilterRequest( )
+		$dock : CharacteristicsHeader( $charList : characteristicsList) from $parkingRequest.characteristicsHeader
+	then
+		$charList.convertToMap(  );
+end

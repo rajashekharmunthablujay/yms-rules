@@ -1,0 +1,14 @@
+package com.kewill.yms.parking.rules;
+
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsList;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsHeader;
+
+rule "LastRule"
+	dialect "mvel"
+	agenda-group "LastRules"
+	when
+		$parkingRequest : YMSLocationFilterRequest( )
+	then
+		$parkingRequest.getCharacteristicsHeader().clear();
+end

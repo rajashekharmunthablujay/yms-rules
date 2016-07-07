@@ -1,0 +1,24 @@
+package com.kewill.yms.parking.rules;
+
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Truck;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Trailer;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Appointment;
+import com.kewill.generic.domains.jaxb.characteristics.Characteristics;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsHeader;
+import com.kewill.generic.domains.jaxb.characteristics.CharacteristicsList;
+
+rule "ParkingRule5"
+	dialect "mvel"
+	salience 70
+	when
+		$parkingRequest : YMSLocationFilterRequest( )
+		$appointment : Appointment( truck != null ) from $parkingRequest.appointment
+		$truck : Truck( trailer != null ) from $appointment.truck
+		$trailer : Trailer( eval( isFlexFlag1()==true )) from $truck.trailer
+		$parking : CharacteristicsHeader( characteristicsList != null ) from $parkingRequest.characteristicsHeader
+		$char : CharacteristicsList( names != null , names.get("Reserved") != null ) from $parking.characteristicsList
+	then
+		$trailer.addParkingCode( $parking.finalSlotCode );
+		setFocus("LastRules");
+end

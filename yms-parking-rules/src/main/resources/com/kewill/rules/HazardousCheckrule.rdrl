@@ -1,0 +1,18 @@
+package com.kewill.yms.parking.rules;
+
+import com.kewill.yms.domains.jaxb.locationfilterreq.YMSLocationFilterRequest;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Truck;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Trailer;
+import com.kewill.yms.domains.jaxb.appointmentoutbound.Appointment;
+
+rule "HazardousCheckrule"
+	dialect "mvel"
+	salience 100
+	when
+		$parkingRequest : YMSLocationFilterRequest( )
+		$appointment : Appointment( truck != null ) from $parkingRequest.appointment
+		$truck : Truck( trailer != null ) from $appointment.truck
+		$trailer : Trailer( eval( isIsHaz()==true )) from $truck.trailer
+	then
+		$trailer.setFlex1( "Hazardous" );
+end
