@@ -4,8 +4,8 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.sample</groupId>
-	<artifactId>jbpm-example</artifactId>
+	<groupId>com.kewill</groupId>
+	<artifactId>yms-dock-rules</artifactId>
 	<version>1.0</version>
 
 	<name>YMS Dock Allocaton Rules project</name>
